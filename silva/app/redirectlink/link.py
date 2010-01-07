@@ -89,12 +89,19 @@ class BackupEditView(silvaviews.SMIView):
 
 @grok.subscribe(ISilvaObject, IObjectMovedEvent)
 def contentMoved(content, event):
+    # We only do if the object is the target of the event.
     if event.object is not content:
         return
+    # Don't create a link if it's an add or remove event.
     if IObjectRemovedEvent.providedBy(event) or \
             IObjectAddedEvent.providedBy(event):
         return
+    # The content might not want redirect link.
     if interfaces.INoPermanentRedirectLink.providedBy(content):
+        return
+    # The extension is not activated.
+    if not content.service_extensions.is_installed(
+        "SilvaPermanentRedirectLink"):
         return
     container = event.oldParent
     factory = container.manage_addProduct['silva.app.redirectlink']
