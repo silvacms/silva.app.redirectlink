@@ -20,12 +20,12 @@ from zope.app.container.interfaces import IObjectAddedEvent, IObjectRemovedEvent
 from zope.app.intid.interfaces import IIntIds
 
 
-class BackupLink(Content, SimpleItem):
+class PermanentRedirectLink(Content, SimpleItem):
     """Backup link object. This let you keep an reference to a moved
     content and redirect to it.
     """
     meta_type = 'Silva Backup Link'
-    grok.implements(interfaces.IBackupLink)
+    grok.implements(interfaces.IPermanentRedirectLink)
     silvaconf.icon('link.png')
 
     security = ClassSecurityInfo()
@@ -52,14 +52,14 @@ class BackupLink(Content, SimpleItem):
         # You can always delete this content.
         return 1
 
-InitializeClass(BackupLink)
+InitializeClass(PermanentRedirectLink)
 
 
-class BackupLinkView(silvaviews.View):
+class PermanentRedirectLinkView(silvaviews.View):
     """View for a backup link: to a permanent redirect.
     """
 
-    grok.context(interfaces.IBackupLink)
+    grok.context(interfaces.IPermanentRedirectLink)
 
     def render(self):
         target = self.context.get_target()
@@ -75,7 +75,7 @@ class BackupEditView(silvaviews.SMIView):
     """Edit view for a backup link.
     """
 
-    grok.context(interfaces.IBackupLink)
+    grok.context(interfaces.IPermanentRedirectLink)
     grok.name(u'tab_edit')
 
     def render(self):
@@ -94,11 +94,11 @@ def contentMoved(content, event):
     if IObjectRemovedEvent.providedBy(event) or \
             IObjectAddedEvent.providedBy(event):
         return
-    if interfaces.INoBackupLink.providedBy(content):
+    if interfaces.INoPermanentRedirectLink.providedBy(content):
         return
     container = event.oldParent
     factory = container.manage_addProduct['silva.app.redirectlink']
-    factory.manage_addBackupLink(event.oldName, content.get_title())
+    factory.manage_addPermanentRedirectLink(event.oldName, content.get_title())
     link = getattr(container, event.oldName)
     link.set_target(content)
     link.sec_update_last_author_info()

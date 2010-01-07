@@ -6,12 +6,12 @@ from silva.core.interfaces import IContent
 from zope.interface import Interface
 
 
-class INoBackupLink(Interface):
+class INoPermanentRedirectLink(Interface):
     """This object can't have a backup link.
     """
 
 
-class IBackupLink(IContent, INoBackupLink):
+class IPermanentRedirectLink(IContent, INoPermanentRedirectLink):
     """A link keep a reference to a moved object. This is use to keep
     the old URL of the object availabe as a permanent http redirect.
     """
