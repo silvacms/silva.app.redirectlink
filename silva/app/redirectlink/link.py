@@ -1,0 +1,104 @@
+# Copyright (c) 2010 Infrae. All rights reserved.
+# See also LICENSE.txt
+# $Id$
+
+from AccessControl import ClassSecurityInfo
+from Globals import InitializeClass
+from Products.Silva.Content import Content
+from Products.Silva import SilvaPermissions
+from OFS.SimpleItem import SimpleItem
+
+from silva.app.redirectlink import interfaces
+from silva.core import conf as silvaconf
+from silva.core.views import views as silvaviews
+from silva.core.interfaces import ISilvaObject
+
+from five import grok
+from zope import component
+from zope.app.container.interfaces import IObjectMovedEvent
+from zope.app.container.interfaces import IObjectAddedEvent, IObjectRemovedEvent
+from zope.app.intid.interfaces import IIntIds
+
+
+class BackupLink(Content, SimpleItem):
+    """Backup link object. This let you keep an reference to a moved
+    content and redirect to it.
+    """
+    meta_type = 'Silva Backup Link'
+    grok.implements(interfaces.IBackupLink)
+    silvaconf.icon('link.png')
+
+    security = ClassSecurityInfo()
+
+    def __init__(self, *args, **kwargs):
+        Content.__init__(self, *args, **kwargs)
+        self.__target_id = None
+
+    security.declareProtected(
+        SilvaPermissions.ChangeSilvaContent, 'set_target')
+    def set_target(self, target):
+        id_utility = component.getUtility(IIntIds)
+        self.__target_id = id_utility.register(target)
+
+    security.declareProtected(
+        SilvaPermissions.ReadSilvaContent, 'get_target')
+    def get_target(self):
+        if self.__target_id is None:
+            return None
+        id_utility = component.getUtility(IIntIds)
+        return id_utility.getObject(self.__target_id)
+
+    def is_deletable(self):
+        # You can always delete this content.
+        return 1
+
+InitializeClass(BackupLink)
+
+
+class BackupLinkView(silvaviews.View):
+    """View for a backup link: to a permanent redirect.
+    """
+
+    grok.context(interfaces.IBackupLink)
+
+    def render(self):
+        target = self.context.get_target()
+        if target is not None:
+            link = target.absolute_url()
+            # We do a permanent redirect
+            self.response.redirect(link, status=301)
+            return 'Redirecting to <a href="%s">%s</a>' % (link, link)
+        return ''
+
+
+class BackupEditView(silvaviews.SMIView):
+    """Edit view for a backup link.
+    """
+
+    grok.context(interfaces.IBackupLink)
+    grok.name(u'tab_edit')
+
+    def render(self):
+        target = self.context.get_target()
+        if target is not None:
+            link = target.absolute_url()
+            self.response.redirect(link + '/edit/tab_edit')
+            return 'Redirecting to <a href="%s">%s</a>' % (link, link)
+        return ''
+
+
+@grok.subscribe(ISilvaObject, IObjectMovedEvent)
+def contentMoved(content, event):
+    if event.object is not content:
+        return
+    if IObjectRemovedEvent.providedBy(event) or \
+            IObjectAddedEvent.providedBy(event):
+        return
+    if interfaces.INoBackupLink.providedBy(content):
+        return
+    container = event.oldParent
+    factory = container.manage_addProduct['silva.app.redirectlink']
+    factory.manage_addBackupLink(event.oldName, content.get_title())
+    link = getattr(container, event.oldName)
+    link.set_target(content)
+    link.sec_update_last_author_info()
