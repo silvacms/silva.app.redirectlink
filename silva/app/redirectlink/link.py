@@ -81,8 +81,8 @@ class BackupEditView(silvaviews.SMIView):
     def render(self):
         target = self.context.get_target()
         if target is not None:
-            link = target.absolute_url()
-            self.response.redirect(link + '/edit/tab_edit')
+            link = target.absolute_url() + '/edit/tab_edit'
+            self.response.redirect(link)
             return 'Redirecting to <a href="%s">%s</a>' % (link, link)
         return ''
 
