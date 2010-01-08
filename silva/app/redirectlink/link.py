@@ -24,7 +24,7 @@ class PermanentRedirectLink(Content, SimpleItem):
     """Backup link object. This let you keep an reference to a moved
     content and redirect to it.
     """
-    meta_type = 'Silva Backup Link'
+    meta_type = 'Silva Permanent Redirect Link'
     grok.implements(interfaces.IPermanentRedirectLink)
     silvaconf.icon('link.png')
 
@@ -100,8 +100,7 @@ def contentMoved(content, event):
     if interfaces.INoPermanentRedirectLink.providedBy(content):
         return
     # The extension is not activated.
-    if not content.service_extensions.is_installed(
-        "SilvaPermanentRedirectLink"):
+    if not content.service_extensions.is_installed("silva.app.redirectlink"):
         return
     container = event.oldParent
     factory = container.manage_addProduct['silva.app.redirectlink']

@@ -7,12 +7,12 @@ from zope.interface import Interface
 from silva.core.conf.installer import DefaultInstaller
 from silva.core import conf as silvaconf
 
-silvaconf.extensionName("SilvaPermanentRedirectLink")
+silvaconf.extensionName("silva.app.redirectlink")
 silvaconf.extensionTitle("Silva Permanent Redirect Link")
 
 class IExtension(Interface):
     """Silva Permanent Redirect Link Extension.
     """
 
-install = DefaultInstaller("SilvaPermanentRedirectLink", IExtension)
+install = DefaultInstaller("silva.app.redirectlink", IExtension)
 
