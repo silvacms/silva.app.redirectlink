@@ -162,7 +162,7 @@ class RedirectLinkViewTestCase(SilvaTestCase.SilvaFunctionalTestCase):
 
 
 @ZopeLiteLayerSetup
-def installExtension():
+def installRedirectExtension():
     installPackage('silva.app.redirectlink')
 
     # Load our ZCML, which add the extension as a Product
@@ -170,9 +170,9 @@ def installExtension():
     zcml.load_config('configure.zcml', redirectlink)
 
 
-def test_suite():
-    installExtension()
+installRedirectExtension()
 
+def test_suite():
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(RedirectLinkCreationTestCase))
     suite.addTest(unittest.makeSuite(RedirectLinkViewTestCase))
