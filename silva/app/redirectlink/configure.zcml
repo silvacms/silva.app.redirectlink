@@ -3,11 +3,16 @@
    xmlns:five="http://namespaces.zope.org/five"
    xmlns:grok="http://namespaces.zope.org/grok">
 
-  <include package="silva.core.conf" />
+  <include package="Products.Silva" />
 
   <five:registerPackage package="." />
-
-  <!-- Grok this package -->
   <grok:grok package="." />
+
+  <adapter
+     for="silva.app.redirectlink.interfaces.IPermanentRedirectLink
+          zope.publisher.interfaces.browser.IBrowserRequest"
+     factory=".link.LinkPublishTraverse"
+     provides="zope.publisher.interfaces.browser.IBrowserPublisher"
+     />
 
 </configure>

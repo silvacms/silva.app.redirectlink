@@ -7,17 +7,21 @@ from Globals import InitializeClass
 from Products.Silva.Content import Content
 from Products.Silva import SilvaPermissions
 from OFS.SimpleItem import SimpleItem
+from ZPublisher.BaseRequest import DefaultPublishTraverse
+from zExceptions import NotFound
 
 from silva.app.redirectlink import interfaces
 from silva.core import conf as silvaconf
 from silva.core.views import views as silvaviews
-from silva.core.interfaces import ISilvaObject
+from silva.core.interfaces import ISilvaObject, IContainer
 
 from five import grok
 from zope import component
 from zope.app.container.interfaces import IObjectMovedEvent
 from zope.app.container.interfaces import IObjectAddedEvent, IObjectRemovedEvent
 from zope.app.intid.interfaces import IIntIds
+from zope.publisher.interfaces.browser import IBrowserPublisher
+from zope.traversing.browser import absoluteURL
 
 
 class PermanentRedirectLink(Content, SimpleItem):
@@ -55,24 +59,71 @@ class PermanentRedirectLink(Content, SimpleItem):
 InitializeClass(PermanentRedirectLink)
 
 
-class PermanentRedirectLinkView(silvaviews.View):
-    """View for a backup link: to a permanent redirect.
+class LinkPublisher(object):
+    """Publish a permanent link: do a permanent redirect to new URL.
     """
 
-    grok.context(interfaces.IPermanentRedirectLink)
+    def __init__(self, context, request, extra=None):
+        self.context = context
+        self.request = request
+        self.extra = extra
 
     def render(self):
+        """Do the redirect.
+        """
+        link = absoluteURL(self.context.get_target(), self.request)
+        if self.extra is not None:
+            link += '/' + '/'.join(self.extra)
+        self.request.response.redirect(link, status=301)
+        return u''
+
+
+class LinkPublishContainerTraverse(object):
+    """Publish an old path that use to be provided by the moved
+    content.
+    """
+
+    grok.implements(IBrowserPublisher)
+
+    def __init__(self, context, target, path):
+        self.context = context
+        self.current_target = target
+        self.extra = [path,]
+
+    def publishTraverse(self, request, name):
+        try:
+            self.current_target = self.current_target.unrestrictedTraverse(name)
+            self.extra.append(name)
+            return self
+        except (NotFound, AttributeError):
+            raise NotFound, name
+
+    def browserDefault(self, request):
+        return LinkPublisher(self.context, request, self.extra), ('render',)
+
+
+class LinkPublishTraverse(DefaultPublishTraverse):
+    """Custom traverser for a link. We don't use the default silva one
+    not do set caching header on the response.
+    """
+
+    def publishTraverse(self, request, name):
         target = self.context.get_target()
-        if target is not None:
-            link = target.absolute_url()
-            # We do a permanent redirect
-            self.response.redirect(link, status=301)
-            return 'Redirecting to <a href="%s">%s</a>' % (link, link)
-        return ''
+        # SMI edit is not redirected
+        if target is not None and name != 'edit':
+            try:
+                return LinkPublishContainerTraverse(
+                    self.context, target.unrestrictedTraverse(name), name)
+            except (NotFound, AttributeError,):
+                pass
+        return super(LinkPublishTraverse, self).publishTraverse(request, name)
+
+    def browserDefault(self, request):
+        return LinkPublisher(self.context, request), ('render',)
 
 
-class BackupEditView(silvaviews.SMIView):
-    """Edit view for a backup link.
+class PermanentRedirectEditView(silvaviews.SMIView):
+    """Edit view for a permanent link.
     """
 
     grok.context(interfaces.IPermanentRedirectLink)

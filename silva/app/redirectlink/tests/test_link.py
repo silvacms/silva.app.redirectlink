@@ -89,8 +89,7 @@ class RedirectLinkCreationTestCase(SilvaTestCase.SilvaTestCase):
         folder = self.add_folder(root, 'folder', 'Folder')
         document = self.add_document(folder, 'doc', 'Document')
         link = self.add_link(folder, 'link', 'Link', 'http://google.com')
-        self.assertListEqual(
-            folder.objectIds(), ['doc', 'link',])
+        self.assertListEqual(folder.objectIds(), ['doc', 'link',])
 
         # Rename them
         folder.manage_renameObject('doc', 'renamed_doc')
@@ -113,6 +112,35 @@ class RedirectLinkCreationTestCase(SilvaTestCase.SilvaTestCase):
         folder.manage_delObjects(['link',])
         self.assertListEqual(
             folder.objectIds(), ['renamed_doc', 'doc', 'renamed_link',])
+
+    def test_rename_container_install(self):
+        """Try to rename a container while the extension is activated.
+        """
+
+        root = self.getRoot()
+        service_extensions = root.service_extensions
+        service_extensions.install('silva.app.redirectlink')
+
+        # Create some test content
+        folder = self.add_folder(root, 'folder', 'Folder')
+        subfolder = self.add_folder(folder, 'subfolder', 'Folder')
+        self.add_document(subfolder, 'doc', 'Document')
+        self.add_document(subfolder, 'other_doc', 'Other Document')
+        self.assertListEqual(folder.objectIds(), ['subfolder',])
+        self.assertListEqual(subfolder.objectIds(), ['doc', 'other_doc',])
+
+        # Rename
+        folder.manage_renameObject('subfolder', 'data')
+        self.assertListEqual(folder.objectIds(), ['data', 'subfolder',])
+        self.assertEqual(folder.data.meta_type, 'Silva Folder')
+        self.assertEqual(
+            folder.subfolder.meta_type, 'Silva Permanent Redirect Link')
+        self.assertSame(folder.subfolder.get_target(), subfolder)
+        self.assertEqual(folder.subfolder.get_title(), subfolder.get_title())
+        self.assertListEqual(subfolder.objectIds(), ['doc', 'other_doc',])
+
+        # And delete
+        folder.manage_delObjects(['subfolder',])
 
     def test_rename_redirectlink(self):
         """We try to rename a permanent redirect link. Nothing should
@@ -143,7 +171,7 @@ class RedirectLinkViewTestCase(SilvaTestCase.SilvaFunctionalTestCase):
 
     layer = RedirectLinkLayer
 
-    def test_redirect(self):
+    def test_content_redirect(self):
         """Viewing one of those objects should redirect you to the new
         one.
         """
@@ -161,10 +189,24 @@ class RedirectLinkViewTestCase(SilvaTestCase.SilvaFunctionalTestCase):
         # Access the document
         response = http('GET /root/folder/doc HTTP/1.1')
         self.assertEqual(response.header_output.status, 301)
-        self.failUnless(response.header_output.headers.has_key('Location'))
+        self.assertListEqual(
+            response.header_output.headers.keys(),
+            ['Location', 'Content-Length',])
         self.assertEqual(
-            response.header_output.headers['Location'],
+            response.getHeader('Location'),
             'http://localhost/root/folder/renamed_doc')
+        self.assertEqual(response.getHeader('Content-Length'), '0')
+
+        # Access a view on the document
+        response = http('GET /root/folder/doc/content.html HTTP/1.1')
+        self.assertEqual(response.header_output.status, 301)
+        self.assertListEqual(
+            response.header_output.headers.keys(),
+            ['Location', 'Content-Length',])
+        self.assertEqual(
+            response.getHeader('Location'),
+            'http://localhost/root/folder/renamed_doc/content.html')
+        self.assertEqual(response.getHeader('Content-Length'), '0')
 
         # Access the edit tab of the document, and you are redirected
         # to the edit tab of the real one.
@@ -172,8 +214,56 @@ class RedirectLinkViewTestCase(SilvaTestCase.SilvaFunctionalTestCase):
         self.assertEqual(response.header_output.status, 302)
         self.failUnless(response.header_output.headers.has_key('Location'))
         self.assertEqual(
-            response.header_output.headers['Location'],
+            response.getHeader('Location'),
             'http://localhost/root/folder/renamed_doc/edit/tab_edit')
+
+        # Other tab and you are fine
+        response = http('GET /root/folder/doc/edit/tab_metadata HTTP/1.1')
+        self.assertEqual(response.header_output.status, 401)
+        response = http('GET /root/folder/doc/edit/tab_nonexistant HTTP/1.1')
+        self.assertEqual(response.header_output.status, 404)
+
+    def test_container_redirect(self):
+        """Try to access a sub url of a moved container.
+        """
+
+        root = self.getRoot()
+        service_extensions = root.service_extensions
+        service_extensions.install('silva.app.redirectlink')
+
+        # Create some test content
+        folder = self.add_folder(root, 'folder', 'Folder')
+        subfolder = self.add_folder(folder, 'subfolder', 'Folder')
+        self.add_document(subfolder, 'doc', 'Document')
+        self.add_document(subfolder, 'other_doc', 'Other Document')
+        folder.manage_renameObject('subfolder', 'data')
+
+        # Access a content of the moved container
+        response = http('GET /root/folder/subfolder/doc HTTP/1.1')
+        self.assertEqual(response.header_output.status, 301)
+        self.assertListEqual(
+            response.header_output.headers.keys(),
+            ['Location', 'Content-Length',])
+        self.assertEqual(
+            response.getHeader('Location'),
+            'http://localhost/root/folder/data/doc')
+        self.assertEqual(response.getHeader('Content-Length'), '0')
+
+        # Access a view on a content of the moved container
+        response = http('GET /root/folder/subfolder/doc/content.html HTTP/1.1')
+        self.assertEqual(response.header_output.status, 301)
+        self.assertListEqual(
+            response.header_output.headers.keys(),
+            ['Location', 'Content-Length',])
+        self.assertEqual(
+            response.getHeader('Location'),
+            'http://localhost/root/folder/data/doc/content.html')
+        self.assertEqual(response.getHeader('Content-Length'), '0')
+
+        # Access a non-existant content of the moved container
+        response = http('GET /root/folder/subfolder/something HTTP/1.1')
+        self.assertEqual(response.header_output.status, 404)
+
 
 def test_suite():
     suite = unittest.TestSuite()
