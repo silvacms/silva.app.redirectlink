@@ -11,10 +11,23 @@ from Testing.ZopeTestCase.zopedoctest.functional import http
 import unittest
 
 
+class RedirectLinkLayer(SilvaTestCase.SilvaLayer):
+
+    @classmethod
+    def setUp(self):
+        installPackage('silva.app.redirectlink')
+
+        # Load our ZCML, which add the extension as a Product
+        from silva.app import redirectlink
+        zcml.load_config('configure.zcml', redirectlink)
+
+
 class RedirectLinkCreationTestCase(SilvaTestCase.SilvaTestCase):
     """Test that a redirect link is created each time an object is
     moved if it is installed.
     """
+
+    layer = RedirectLinkLayer
 
     def afterSetUp(self):
         # XXX: should be author permission
@@ -128,6 +141,8 @@ class RedirectLinkViewTestCase(SilvaTestCase.SilvaFunctionalTestCase):
     the target element.
     """
 
+    layer = RedirectLinkLayer
+
     def test_redirect(self):
         """Viewing one of those objects should redirect you to the new
         one.
@@ -159,18 +174,6 @@ class RedirectLinkViewTestCase(SilvaTestCase.SilvaFunctionalTestCase):
         self.assertEqual(
             response.header_output.headers['Location'],
             'http://localhost/root/folder/renamed_doc/edit/tab_edit')
-
-
-@ZopeLiteLayerSetup
-def installRedirectExtension():
-    installPackage('silva.app.redirectlink')
-
-    # Load our ZCML, which add the extension as a Product
-    from silva.app import redirectlink
-    zcml.load_config('configure.zcml', redirectlink)
-
-
-installRedirectExtension()
 
 def test_suite():
     suite = unittest.TestSuite()
