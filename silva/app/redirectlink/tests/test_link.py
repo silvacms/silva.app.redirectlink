@@ -15,11 +15,12 @@ class RedirectLinkLayer(SilvaTestCase.SilvaLayer):
 
     @classmethod
     def setUp(self):
-        installPackage('silva.app.redirectlink')
-
         # Load our ZCML, which add the extension as a Product
         from silva.app import redirectlink
         zcml.load_config('configure.zcml', redirectlink)
+
+        installPackage('silva.app.redirectlink')
+
 
 
 class RedirectLinkCreationTestCase(SilvaTestCase.SilvaTestCase):
