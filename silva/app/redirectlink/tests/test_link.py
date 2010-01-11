@@ -2,25 +2,11 @@
 # See also LICENSE.txt
 # $Id$
 
-from Products.Five import zcml
 from Products.Silva.tests import SilvaTestCase
-from Testing.ZopeTestCase import installPackage
-from Testing.ZopeTestCase.layer import onsetup as ZopeLiteLayerSetup
 from Testing.ZopeTestCase.zopedoctest.functional import http
 
+from silva.app.redirectlink.testing import RedirectLinkLayer
 import unittest
-
-
-class RedirectLinkLayer(SilvaTestCase.SilvaLayer):
-
-    @classmethod
-    def setUp(self):
-        # Load our ZCML, which add the extension as a Product
-        from silva.app import redirectlink
-        zcml.load_config('configure.zcml', redirectlink)
-
-        installPackage('silva.app.redirectlink')
-
 
 
 class RedirectLinkCreationTestCase(SilvaTestCase.SilvaTestCase):
