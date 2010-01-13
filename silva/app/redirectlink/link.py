@@ -10,6 +10,8 @@ from OFS.SimpleItem import SimpleItem
 from ZPublisher.BaseRequest import DefaultPublishTraverse
 from zExceptions import NotFound
 
+from Products.SilvaMetadata.interfaces import IMetadataService
+
 from silva.app.redirectlink import interfaces
 from silva.core import conf as silvaconf
 from silva.core.views import views as silvaviews
@@ -158,4 +160,6 @@ def contentMoved(content, event):
     factory.manage_addPermanentRedirectLink(event.oldName, content.get_title())
     link = getattr(container, event.oldName)
     link.set_target(content)
+    binding = component.getUtility(IMetadataService).getMetadata(link)
+    binding.setValues('silva-extra', {'hide_from_tocs': 'hide'})
     link.sec_update_last_author_info()
