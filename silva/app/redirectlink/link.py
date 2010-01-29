@@ -16,7 +16,7 @@ from silva.app.redirectlink.interfaces import IPermanentRedirectLink
 from silva.app.redirectlink.interfaces import INoPermanentRedirectLink
 from silva.core import conf as silvaconf
 from silva.core.views import views as silvaviews
-from silva.core.interfaces import ISilvaObject, IContainer
+from silva.core.interfaces import ISilvaObject
 
 from five import grok
 from zope import component
