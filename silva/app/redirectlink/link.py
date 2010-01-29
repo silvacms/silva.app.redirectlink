@@ -12,7 +12,8 @@ from zExceptions import NotFound
 
 from Products.SilvaMetadata.interfaces import IMetadataService
 
-from silva.app.redirectlink import interfaces
+from silva.app.redirectlink.interfaces import IPermanentRedirectLink
+from silva.app.redirectlink.interfaces import INoPermanentRedirectLink
 from silva.core import conf as silvaconf
 from silva.core.views import views as silvaviews
 from silva.core.interfaces import ISilvaObject, IContainer
@@ -31,7 +32,7 @@ class PermanentRedirectLink(Content, SimpleItem):
     content and redirect to it.
     """
     meta_type = 'Silva Permanent Redirect Link'
-    grok.implements(interfaces.IPermanentRedirectLink)
+    grok.implements(IPermanentRedirectLink)
     silvaconf.icon('link.png')
 
     security = ClassSecurityInfo()
@@ -52,7 +53,10 @@ class PermanentRedirectLink(Content, SimpleItem):
         if self.__target_id is None:
             return None
         id_utility = component.getUtility(IIntIds)
-        return id_utility.getObject(self.__target_id)
+        try:
+            return id_utility.getObject(self.__target_id)
+        except KeyError:
+            return None
 
     def is_deletable(self):
         # You can always delete this content.
@@ -73,7 +77,10 @@ class LinkPublisher(object):
     def render(self):
         """Do the redirect.
         """
-        link = absoluteURL(self.context.get_target(), self.request)
+        target = self.context.get_target()
+        if target is None:
+            raise NotFound
+        link = absoluteURL(target, self.request)
         if self.extra is not None:
             link += '/' + '/'.join(self.extra)
         self.request.response.redirect(link, status=301)
@@ -87,18 +94,26 @@ class LinkPublishContainerTraverse(object):
 
     grok.implements(IBrowserPublisher)
 
-    def __init__(self, context, target, path):
+    def __init__(self, context, target):
         self.context = context
         self.current_target = target
-        self.extra = [path,]
+        self.extra = []
 
     def publishTraverse(self, request, name):
         try:
-            self.current_target = self.current_target.unrestrictedTraverse(name)
-            self.extra.append(name)
+            content = self.current_target.unrestrictedTraverse(name)
+            if IPermanentRedirectLink.providedBy(content):
+                self.context = content
+                self.current_target = content.get_target()
+                if self.current_target is None:
+                    raise NotFound(name)
+                self.extra = []
+            else:
+                self.current_target = content
+                self.extra.append(name)
             return self
         except (NotFound, AttributeError):
-            raise NotFound, name
+            raise NotFound(name)
 
     def browserDefault(self, request):
         return LinkPublisher(self.context, request, self.extra), ('render',)
@@ -114,9 +129,9 @@ class LinkPublishTraverse(DefaultPublishTraverse):
         # SMI edit is not redirected
         if target is not None and name != 'edit':
             try:
-                return LinkPublishContainerTraverse(
-                    self.context, target.unrestrictedTraverse(name), name)
-            except (NotFound, AttributeError,):
+                traverser = LinkPublishContainerTraverse(self.context, target)
+                return traverser.publishTraverse(request, name)
+            except NotFound:
                 pass
         return super(LinkPublishTraverse, self).publishTraverse(request, name)
 
@@ -128,7 +143,7 @@ class PermanentRedirectEditView(silvaviews.SMIView):
     """Edit view for a permanent link.
     """
 
-    grok.context(interfaces.IPermanentRedirectLink)
+    grok.context(IPermanentRedirectLink)
     grok.name(u'tab_edit')
 
     def render(self):
@@ -150,7 +165,7 @@ def contentMoved(content, event):
             IObjectAddedEvent.providedBy(event):
         return
     # The content might not want redirect link.
-    if interfaces.INoPermanentRedirectLink.providedBy(content):
+    if INoPermanentRedirectLink.providedBy(content):
         return
     # The extension is not activated.
     if not content.service_extensions.is_installed("silva.app.redirectlink"):
