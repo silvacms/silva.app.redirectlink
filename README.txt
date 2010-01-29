@@ -2,23 +2,24 @@
 silva.app.redirectlink
 ======================
 
-``silva.app.redirectlink`` is an extension for Silva 2.2 that let you
+``silva.app.redirectlink`` is an extension for Silva 2.2 that lets you
 use a new a content type, a redirect link, which does a permanent HTTP
 redirect to its target.
 
-You don't add directly those redirect links to your site, however they
-are automatically created when you move or rename contents in Silva.
+You shouldn't add these redirect links to your site manually. They
+are automatically created when you move or rename content in Silva.
 
-This let you preserve old URLs to access moved or renamed contents,
+This lets you preserve old URLs to access moved or renamed contents,
 telling the visitor to permanently update its reference to it. This
-let as well search engines to update theirs search caches with the new
-URL of your moved or renamed content. So this prevent to disappear
-from search results when you add a good place before.
+means search engines will update their search caches with the new
+URL of your moved or renamed content. This prevents having content
+disappear from search results when it was easily found before.
 
-When you think that visitors and search engines have updated theirs
+When you think that visitors and search engines have updated their
 references to the moved or renamed contents, you can delete those links
-in order to definitely disable all old URLs.
+in order to definitively disable all old URLs.
 
-You can keep moving and renaming a content as many times you wish, the
-redirect link will keep tracking the content each time it move.
+You can keep moving and renaming content items as many times you wish.
+The redirect link will keep tracking the content each time it moves 
+using intids.
 
