@@ -144,15 +144,16 @@ class PermanentRedirectEditView(silvaviews.SMIView):
     """
 
     grok.context(IPermanentRedirectLink)
+    grok.require('silva.ChangeSilvaContent')
     grok.name(u'tab_edit')
 
-    def render(self):
+    def update(self):
         target = self.context.get_target()
+        self.target_url = None
         if target is not None:
-            link = target.absolute_url() + '/edit/tab_edit'
-            self.response.redirect(link)
-            return 'Redirecting to <a href="%s">%s</a>' % (link, link)
-        return ''
+            self.target_url = absoluteURL(target, self.request)
+        self.target = target
+
 
 
 @grok.subscribe(ISilvaObject, IObjectMovedEvent)

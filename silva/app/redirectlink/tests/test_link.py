@@ -204,16 +204,8 @@ class ContentViewTestCase(SilvaTestCase.SilvaFunctionalTestCase):
     def test_smi(self):
         """Access SMI tabs on a redirect link.
         """
-        # Access the edit tab of the document, and you are redirected
-        # to the edit tab of the real one.
         response = http('GET /root/folder/doc/edit/tab_edit HTTP/1.1')
-        self.assertEqual(response.header_output.status, 302)
-        self.failUnless(response.header_output.headers.has_key('Location'))
-        self.assertEqual(
-            response.getHeader('Location'),
-            'http://localhost/root/folder/renamed_doc/edit/tab_edit')
-
-        # Other tab and you are fine
+        self.assertEqual(response.header_output.status, 401)
         response = http('GET /root/folder/doc/edit/tab_metadata HTTP/1.1')
         self.assertEqual(response.header_output.status, 401)
         response = http('GET /root/folder/doc/edit/tab_nonexistant HTTP/1.1')
