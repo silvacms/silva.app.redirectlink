@@ -20,6 +20,6 @@ references to the moved or renamed contents, you can delete those links
 in order to definitively disable all old URLs.
 
 You can keep moving and renaming content items as many times you wish.
-The redirect link will keep tracking the content each time it moves 
+The redirect link will keep tracking the content each time it moves
 using intids.
 
