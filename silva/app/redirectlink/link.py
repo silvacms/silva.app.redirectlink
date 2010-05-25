@@ -3,10 +3,10 @@
 # $Id$
 
 from AccessControl import ClassSecurityInfo
-from Globals import InitializeClass
-from Products.Silva.Content import Content
-from Products.Silva import SilvaPermissions
+from App.class_init import InitializeClass
 from OFS.SimpleItem import SimpleItem
+from Products.Silva import SilvaPermissions
+from Products.Silva.Content import Content
 from ZPublisher.BaseRequest import DefaultPublishTraverse
 from zExceptions import NotFound
 
@@ -20,9 +20,9 @@ from silva.core.interfaces import ISilvaObject
 
 from five import grok
 from zope import component
-from zope.app.container.interfaces import IObjectMovedEvent
-from zope.app.container.interfaces import IObjectAddedEvent, IObjectRemovedEvent
-from zope.app.intid.interfaces import IIntIds
+from zope.container.interfaces import IObjectMovedEvent
+from zope.container.interfaces import IObjectAddedEvent, IObjectRemovedEvent
+from zope.intid.interfaces import IIntIds
 from zope.publisher.interfaces.browser import IBrowserPublisher
 from zope.traversing.browser import absoluteURL
 
@@ -91,7 +91,6 @@ class LinkPublishContainerTraverse(object):
     """Publish an old path that use to be provided by the moved
     content.
     """
-
     grok.implements(IBrowserPublisher)
 
     def __init__(self, context, target):
@@ -142,7 +141,6 @@ class LinkPublishTraverse(DefaultPublishTraverse):
 class PermanentRedirectEditView(silvaviews.SMIView):
     """Edit view for a permanent link.
     """
-
     grok.context(IPermanentRedirectLink)
     grok.require('silva.ChangeSilvaContent')
     grok.name(u'tab_edit')
