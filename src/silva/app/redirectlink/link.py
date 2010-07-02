@@ -15,7 +15,7 @@ from Products.SilvaMetadata.interfaces import IMetadataService
 from silva.app.redirectlink.interfaces import IPermanentRedirectLink
 from silva.app.redirectlink.interfaces import INoPermanentRedirectLink
 from silva.core import conf as silvaconf
-from silva.core.views import views as silvaviews
+from silva.core.smi.smi import SMIView
 from silva.core.interfaces import ISilvaObject
 
 from five import grok
@@ -138,7 +138,7 @@ class LinkPublishTraverse(DefaultPublishTraverse):
         return LinkPublisher(self.context, request), ('render',)
 
 
-class PermanentRedirectEditView(silvaviews.SMIView):
+class PermanentRedirectEditView(SMIView):
     """Edit view for a permanent link.
     """
     grok.context(IPermanentRedirectLink)
