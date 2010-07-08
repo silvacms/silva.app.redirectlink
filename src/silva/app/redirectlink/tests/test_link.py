@@ -184,7 +184,7 @@ class ContentViewTestCase(RedirectLinkTestCase):
         self.assertEqual(response.getStatus(), 301)
         self.assertListEqual(
             response.getHeaders(),
-            ['Content-Length', 'Content-Type', 'Location'])
+            ['Content-Length', 'Location'])
         self.assertEqual(
             response.getHeader('Location'),
             'http://localhost/root/folder/renamed_doc')
@@ -199,7 +199,7 @@ class ContentViewTestCase(RedirectLinkTestCase):
         self.assertEqual(response.getStatus(), 301)
         self.assertListEqual(
             response.getHeaders(),
-            ['Content-Length', 'Content-Type', 'Location'])
+            ['Content-Length', 'Location'])
         self.assertEqual(
             response.getHeader('Location'),
             'http://localhost/root/folder/renamed_doc/content.html')
@@ -257,7 +257,7 @@ class ContainerViewTestCase(RedirectLinkTestCase):
         self.assertEqual(response.getStatus(), 301)
         self.assertListEqual(
             response.getHeaders(),
-            ['Content-Length', 'Content-Type', 'Location'])
+            ['Content-Length', 'Location'])
         self.assertEqual(
             response.getHeader('Location'),
             'http://localhost/root/folder/data/doc')
@@ -272,7 +272,7 @@ class ContainerViewTestCase(RedirectLinkTestCase):
         self.assertEqual(response.getStatus(), 301)
         self.assertListEqual(
             response.getHeaders(),
-            ['Content-Length', 'Content-Type', 'Location'])
+            ['Content-Length', 'Location'])
         self.assertEqual(
             response.getHeader('Location'),
             'http://localhost/root/folder/data/doc/content.html')
@@ -327,7 +327,7 @@ class DoubleContainerViewTestCase(RedirectLinkTestCase):
         self.assertEqual(response.getStatus(), 301)
         self.assertListEqual(
             response.getHeaders(),
-            ['Content-Length', 'Content-Type', 'Location'])
+            ['Content-Length', 'Location'])
         self.assertEqual(
             response.getHeader('Location'),
             'http://localhost/root/intern/data/doc')
@@ -343,7 +343,7 @@ class DoubleContainerViewTestCase(RedirectLinkTestCase):
         self.assertEqual(response.getStatus(), 301)
         self.assertListEqual(
             response.getHeaders(),
-            ['Content-Length', 'Content-Type', 'Location'])
+            ['Content-Length', 'Location'])
         self.assertEqual(
             response.getHeader('Location'),
             'http://localhost/root/intern/data/doc/content.html')

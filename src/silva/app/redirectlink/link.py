@@ -79,7 +79,7 @@ class LinkPublisher(object):
         """
         target = self.context.get_target()
         if target is None:
-            raise NotFound
+            raise NotFound()
         link = absoluteURL(target, self.request)
         if self.extra is not None:
             link += '/' + '/'.join(self.extra)
