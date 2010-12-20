@@ -6,7 +6,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.0.1'
+version = '1.0.2dev'
 
 setup(name='silva.app.redirectlink',
       version=version,
