@@ -207,7 +207,7 @@ class ContentViewTestCase(SilvaTestCase.SilvaFunctionalTestCase):
         response = http('GET /root/folder/doc/edit/tab_edit HTTP/1.1')
         self.assertEqual(response.header_output.status, 401)
         response = http('GET /root/folder/doc/edit/tab_metadata HTTP/1.1')
-        self.assertEqual(response.header_output.status, 401)
+        self.assertEqual(response.header_output.status, 404)
         response = http('GET /root/folder/doc/edit/tab_nonexistant HTTP/1.1')
         self.assertEqual(response.header_output.status, 404)
 
