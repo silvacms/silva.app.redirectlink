@@ -5,6 +5,7 @@
 import unittest
 
 import silva.app.redirectlink
+from silva.core.interfaces import IPublicationWorkflow
 from Products.Silva.testing import SilvaLayer
 
 
@@ -23,12 +24,16 @@ class RedirectLinkTestCase(unittest.TestCase):
     def add_link(self, root, identifier, title):
         factory = root.manage_addProduct['Silva']
         factory.manage_addLink(identifier, title)
-        return getattr(root, identifier)
+        link = getattr(root, identifier)
+        IPublicationWorkflow(link).publish()
+        return link
 
     def add_document(self, root, identifier, title):
         factory = root.manage_addProduct['Silva']
         factory.manage_addMockupVersionedContent(identifier, title)
-        return getattr(root, identifier)
+        mock = getattr(root, identifier)
+        IPublicationWorkflow(mock).publish()
+        return mock
 
 
 class ContentCreationTestCase(RedirectLinkTestCase):
@@ -336,6 +341,9 @@ class DoubleContainerViewTestCase(RedirectLinkTestCase):
         # Access a view on a content of the moved container
         browser = self.layer.get_browser()
         browser.options.follow_redirect = False
+        browser.options.handle_errors = False
+        status = browser.open('/root/intern/data/doc/content.html')
+        self.assertEqual(200, status)
         status = browser.open('/root/folder/subfolder/doc/content.html')
         self.assertEqual(301, status)
         self.assertEqual(
