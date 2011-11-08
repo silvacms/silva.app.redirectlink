@@ -25,14 +25,22 @@ class RedirectLinkTestCase(unittest.TestCase):
         factory = root.manage_addProduct['Silva']
         factory.manage_addLink(identifier, title)
         link = getattr(root, identifier)
+
+        self.layer.login('editor')
         IPublicationWorkflow(link).publish()
+        self.layer.login('author')
+
         return link
 
     def add_document(self, root, identifier, title):
         factory = root.manage_addProduct['Silva']
         factory.manage_addMockupVersionedContent(identifier, title)
         mock = getattr(root, identifier)
+
+        self.layer.login('editor')
         IPublicationWorkflow(mock).publish()
+        self.layer.login('author')
+
         return mock
 
 
@@ -223,7 +231,7 @@ class ContentViewTestCase(RedirectLinkTestCase):
     def test_smi(self):
         """Access SMI tabs on a redirect link.
         """
-        raise RuntimeError('needs selenium')
+        raise AssertionError('needs selenium')
         # response = http(
         #     'GET /root/folder/doc/edit/tab_edit HTTP/1.1', parsed=True)
         # self.assertEqual(response.getStatus(), 401)

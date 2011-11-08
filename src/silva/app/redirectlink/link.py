@@ -58,9 +58,6 @@ class PermanentRedirectLink(Content, SimpleItem):
         except KeyError:
             return None
 
-    def is_deletable(self):
-        # You can always delete this content.
-        return 1
 
 InitializeClass(PermanentRedirectLink)
 
@@ -125,8 +122,7 @@ class LinkPublishTraverse(DefaultPublishTraverse):
 
     def publishTraverse(self, request, name):
         target = self.context.get_target()
-        # SMI edit is not redirected
-        if target is not None and name != 'edit':
+        if target is not None:
             try:
                 traverser = LinkPublishContainerTraverse(self.context, target)
                 return traverser.publishTraverse(request, name)
@@ -143,7 +139,7 @@ class PermanentRedirectEditView(PageWithTemplateREST):
     """
     grok.context(IPermanentRedirectLink)
     grok.require('silva.ChangeSilvaContent')
-    grok.name('silva.ui.content')
+    grok.name('content')
 
     def update(self):
         target = self.context.get_target()
