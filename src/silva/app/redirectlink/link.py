@@ -12,10 +12,11 @@ from zExceptions import NotFound
 
 from Products.SilvaMetadata.interfaces import IMetadataService
 
-from silva.app.redirectlink.interfaces import IPermanentRedirectLink
 from silva.app.redirectlink.interfaces import INoPermanentRedirectLink
+from silva.app.redirectlink.interfaces import IPermanentRedirectLink
 from silva.core import conf as silvaconf
 from silva.core.interfaces import ISilvaObject
+from silva.core.smi.content import IEditScreen
 from silva.ui.rest import PageWithTemplateREST
 
 from five import grok
@@ -140,6 +141,7 @@ class PermanentRedirectEditView(PageWithTemplateREST):
     grok.context(IPermanentRedirectLink)
     grok.require('silva.ChangeSilvaContent')
     grok.name('content')
+    grok.implements(IEditScreen)
 
     def update(self):
         target = self.context.get_target()

@@ -36,6 +36,7 @@ setup(name='silva.app.redirectlink',
       install_requires=[
         'Products.Silva',
         'five.grok',
+        'megrok.chameleon',
         'setuptools',
         'silva.core.conf',
         'silva.core.interfaces',

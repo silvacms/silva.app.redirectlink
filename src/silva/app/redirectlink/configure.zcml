@@ -4,6 +4,7 @@
    xmlns:grok="http://namespaces.zope.org/grok">
 
   <include package="Products.Silva" />
+  <include package="megrok.chameleon" />
 
   <five:registerPackage package="." />
   <grok:grok package="." />

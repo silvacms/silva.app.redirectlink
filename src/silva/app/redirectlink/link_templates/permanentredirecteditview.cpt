@@ -6,20 +6,17 @@
     <h3 i18n:domain="silva">
       Redirect link
     </h3>
-  </div>
-
-  <div class="form-body">
     <p>
       This is the target of this link:
       <tal:broken
-         tal:condition="not:view/target"
+         tal:condition="not rest.target"
          i18n:translate="">
         is broken.
       </tal:broken>
-      <tal:target tal:condition="view/target">
+      <tal:target tal:condition="rest.target">
         <a href="#"
-           tal:content="view/target/get_title_or_id">
-        </a>
+           tal:content="rest.target.get_title_or_id()">
+        </a>.
       </tal:target>
     </p>
   </div>
