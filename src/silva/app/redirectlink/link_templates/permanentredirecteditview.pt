@@ -1,47 +1,27 @@
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:metal="http://xml.zope.org/namespaces/metal"
-      xmlns:tal="http://xml.zope.org/namespaces/tal"
+<form name="editform"
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-      metal:use-macro="context/@@standard_macros/page">
-  <body>
-    <div metal:fill-slot="body">
-      <table class="listing"
-             i18n:domain="silva">
-        <thead>
-          <tr>
-            <td class="top" colspan="2">
-              <h2>
-                <!-- Should be on the view -->
-                <img tal:replace="structure python:context.render_icon(context)" />
-                Silva Permanent Redirect Link
-                &#xab;<span tal:replace="context/getId" />&#xbb;
-              </h2>
-            </td>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="even">
-            <td class="designator" width="24%"
-                i18n:translate="">
-              This is the target of this link:
-            </td>
-            <td class="field">
-              <tal:broken
-                 tal:condition="not:view/target"
-                 i18n:translate="">
-                This permanent link is broken.
-              </tal:broken>
-              <tal:target tal:condition="view/target">
-                <a href="#"
-                   tal:attributes="href string:${view/target_url}/edit"
-                   tal:content="view/target/get_title_or_id">
-                </a>
-              </tal:target>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </body>
-</html>
+      i18n:domain="silva">
 
+  <div class="form-head">
+    <h3 i18n:domain="silva">
+      Redirect link
+    </h3>
+  </div>
+
+  <div class="form-body">
+    <p>
+      This is the target of this link:
+      <tal:broken
+         tal:condition="not:view/target"
+         i18n:translate="">
+        is broken.
+      </tal:broken>
+      <tal:target tal:condition="view/target">
+        <a href="#"
+           tal:content="view/target/get_title_or_id">
+        </a>
+      </tal:target>
+    </p>
+  </div>
+
+</form>
