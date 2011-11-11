@@ -6,7 +6,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.2dev'
+version = '3.0b1'
 
 tests_require = [
     'Products.Silva [test]',
@@ -35,15 +35,18 @@ setup(name='silva.app.redirectlink',
       zip_safe=False,
       install_requires=[
         'Products.Silva',
+        'Products.SilvaMetadata',
         'five.grok',
         'megrok.chameleon',
         'setuptools',
         'silva.core.conf',
         'silva.core.interfaces',
-        'silva.core.views',
+        'silva.core.smi',
+        'silva.ui',
         'zope.component',
         'zope.container',
         'zope.interface',
+        'zope.intid',
         'zope.publisher',
         'zope.traversing',
         ],

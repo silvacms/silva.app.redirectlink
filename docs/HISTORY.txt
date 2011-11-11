@@ -1,10 +1,12 @@
 ChangeLog
 =========
 
-1.2 (unreleased)
-----------------
+3.0b1 (2011/11/11)
+------------------
 
-- ...
+- Update code for Zope 2.13 and Python 2.6.
+
+- Rebuild SMI interface with ``silva.ui``.
 
 1.1 (2010/07/16)
 ----------------
