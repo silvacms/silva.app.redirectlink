@@ -20,7 +20,7 @@ from silva.core.smi.content import IEditScreen
 from silva.ui.rest import PageWithTemplateREST
 
 from five import grok
-from zope import component
+from zope.component import getUtility
 from zope.container.interfaces import IObjectMovedEvent
 from zope.container.interfaces import IObjectAddedEvent, IObjectRemovedEvent
 from zope.intid.interfaces import IIntIds
@@ -45,17 +45,17 @@ class PermanentRedirectLink(Content, SimpleItem):
     security.declareProtected(
         SilvaPermissions.ChangeSilvaContent, 'set_target')
     def set_target(self, target):
-        id_utility = component.getUtility(IIntIds)
-        self.__target_id = id_utility.register(target)
+        utility = getUtility(IIntIds)
+        self.__target_id = utility.register(target)
 
     security.declareProtected(
         SilvaPermissions.ReadSilvaContent, 'get_target')
     def get_target(self):
         if self.__target_id is None:
             return None
-        id_utility = component.getUtility(IIntIds)
+        utility = getUtility(IIntIds)
         try:
-            return id_utility.getObject(self.__target_id)
+            return utility.getObject(self.__target_id)
         except KeyError:
             return None
 
@@ -172,6 +172,6 @@ def contentMoved(content, event):
     factory.manage_addPermanentRedirectLink(event.oldName, content.get_title())
     link = getattr(container, event.oldName)
     link.set_target(content)
-    binding = component.getUtility(IMetadataService).getMetadata(link)
-    binding.setValues('silva-extra', {'hide_from_tocs': 'hide'})
+    binding = getUtility(IMetadataService).getMetadata(link)
+    binding.setValues('silva-settings', {'hide_from_tocs': 'hide'})
     link.sec_update_last_author_info()

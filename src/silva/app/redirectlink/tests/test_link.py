@@ -6,6 +6,8 @@ import unittest
 
 import silva.app.redirectlink
 from silva.core.interfaces import IPublicationWorkflow
+from zope.component import getUtility
+from Products.SilvaMetadata.interfaces import IMetadataService
 from Products.Silva.testing import SilvaLayer
 
 
@@ -55,16 +57,14 @@ class ContentCreationTestCase(RedirectLinkTestCase):
         """
         # First test installation
         service_extensions = self.root.service_extensions
-        self.failIf(
-            service_extensions.is_installed('silva.app.redirectlink'))
+        is_installed = service_extensions.is_installed
+        self.assertFalse(is_installed('silva.app.redirectlink'))
         service_extensions.install('silva.app.redirectlink')
-        self.failUnless(
-            service_extensions.is_installed('silva.app.redirectlink'))
+        self.assertTrue(is_installed('silva.app.redirectlink'))
 
         # Uninstall it
         service_extensions.uninstall('silva.app.redirectlink')
-        self.failIf(
-            service_extensions.is_installed('silva.app.redirectlink'))
+        self.assertFalse(is_installed('silva.app.redirectlink'))
 
     def test_rename_uninstalled(self):
         """If you rename an object while the extension is not
@@ -128,6 +128,7 @@ class ContentCreationTestCase(RedirectLinkTestCase):
     def test_rename_container_install(self):
         """Try to rename a container while the extension is activated.
         """
+        get_metadata = getUtility(IMetadataService).getMetadataValue
         service_extensions = self.root.service_extensions
         service_extensions.install('silva.app.redirectlink')
 
@@ -148,6 +149,9 @@ class ContentCreationTestCase(RedirectLinkTestCase):
         self.assertEqual(folder.subfolder.get_target(), subfolder)
         self.assertEqual(folder.subfolder.get_title(), subfolder.get_title())
         self.assertListEqual(subfolder.objectIds(), ['doc', 'other_doc',])
+        self.assertEqual(
+            get_metadata(folder.subfolder, 'silva-settings', 'hide_from_tocs'),
+            'hide')
 
         # And delete
         folder.manage_delObjects(['subfolder',])
