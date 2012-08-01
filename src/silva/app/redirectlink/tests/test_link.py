@@ -235,7 +235,9 @@ class ContentViewTestCase(RedirectLinkTestCase):
     def test_smi(self):
         """Access SMI tabs on a redirect link.
         """
-        raise AssertionError('needs selenium')
+        with self.layer.get_web_browser() as browser:
+            # XXX Need to be updated
+            browser.open('/somethingthatwillerrorwhencalled')
         # response = http(
         #     'GET /root/folder/doc/edit/tab_edit HTTP/1.1', parsed=True)
         # self.assertEqual(response.getStatus(), 401)
