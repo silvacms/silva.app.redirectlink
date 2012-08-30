@@ -153,7 +153,7 @@ class PermanentRedirectEditView(PageWithTemplateREST):
 
 
 @grok.subscribe(ISilvaObject, IObjectMovedEvent)
-def contentMoved(content, event):
+def content_moved(content, event):
     # We only do if the object is the target of the event.
     if event.object is not content:
         return
@@ -174,4 +174,3 @@ def contentMoved(content, event):
     link.set_target(content)
     binding = getUtility(IMetadataService).getMetadata(link)
     binding.setValues('silva-settings', {'hide_from_tocs': 'hide'})
-    link.sec_update_last_author_info()
