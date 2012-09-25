@@ -5,7 +5,7 @@ silva.app.redirectlink
 Introduction
 ============
 
-``silva.app.redirectlink`` is an extension for Silva 2.2 that lets you
+``silva.app.redirectlink`` is an extension for Silva 3.0 that lets you
 use a new a content type, a redirect link, which does a permanent HTTP
 redirect to its target.
 
@@ -25,6 +25,9 @@ in order to definitively disable all old URLs.
 You can keep moving and renaming content items as many times you wish.
 The redirect link will keep tracking the content each time it moves
 using intids.
+
+For previous version of Silva, look at previous version of
+``silva.app.redirectlink``.
 
 Code repository
 ===============
