@@ -4,11 +4,14 @@
 
 import unittest
 
-import silva.app.redirectlink
-from silva.core.interfaces import IPublicationWorkflow
-from zope.component import getUtility
-from Products.SilvaMetadata.interfaces import IMetadataService
 from Products.Silva.testing import SilvaLayer
+from silva.core.interfaces import IAddableContents
+from silva.core.interfaces import IPublicationWorkflow
+from silva.core.services.interfaces import IMetadataService
+from zope.interface.verify import verifyObject
+from zope.component import getUtility
+import silva.app.redirectlink
+
 
 
 class RedirectLinkTestCase(unittest.TestCase):
@@ -177,6 +180,25 @@ class ContentCreationTestCase(RedirectLinkTestCase):
         self.assertEqual(
             folder.old_doc.meta_type, 'Silva Permanent Redirect Link')
 
+    def test_redirectlink_is_not_addable(self):
+        """A redirect link should not be addable.
+        """
+        service_extensions = self.root.service_extensions
+        service_extensions.install('silva.app.redirectlink')
+
+        # Check addables.
+        addables = IAddableContents(self.root)
+        self.assertTrue(verifyObject(IAddableContents, addables))
+        self.assertNotIn(
+            'Silva Permanent Redirect Link',
+            addables.get_all_addables())
+        self.assertNotIn(
+            'Silva Permanent Redirect Link',
+            addables.get_container_addables())
+        self.assertNotIn(
+            'Silva Permanent Redirect Link',
+            addables.get_authorized_addables())
+
 
 class ContentViewTestCase(RedirectLinkTestCase):
     """Test that if you view a redirect link you are well redirect to
@@ -231,23 +253,6 @@ class ContentViewTestCase(RedirectLinkTestCase):
         browser = self.layer.get_browser()
         status = browser.open('/root/folder/doc')
         self.assertEqual(status, 404)
-
-    def test_smi(self):
-        """Access SMI tabs on a redirect link.
-        """
-        with self.layer.get_web_browser() as browser:
-            # XXX Need to be updated
-            browser.open('/somethingthatwillerrorwhencalled')
-        # response = http(
-        #     'GET /root/folder/doc/edit/tab_edit HTTP/1.1', parsed=True)
-        # self.assertEqual(response.getStatus(), 401)
-        # response = http(
-        #     'GET /root/folder/doc/edit/tab_metadata HTTP/1.1', parsed=True)
-        # self.assertEqual(response.getStatus(), 401)
-        # response = http(
-        #     'GET /root/folder/doc/edit/tab_nonexistant HTTP/1.1',
-        #     handle_errors=True, parsed=True)
-        # self.assertEqual(response.getStatus(), 404)
 
 
 class ContainerViewTestCase(RedirectLinkTestCase):
