@@ -5,9 +5,9 @@ silva.app.redirectlink
 Introduction
 ============
 
-``silva.app.redirectlink`` is an extension for Silva 3.0 that lets you
-use a new a content type, a redirect link, which does a permanent HTTP
-redirect to its target.
+``silva.app.redirectlink`` is an extension for `Silva`_ 3.0 that lets
+you use a new a content type, a redirect link, which does a permanent
+HTTP redirect to its target.
 
 You shouldn't add these redirect links to your site manually. They
 are automatically created when you move or rename content in Silva.
@@ -26,11 +26,13 @@ You can keep moving and renaming content items as many times you wish.
 The redirect link will keep tracking the content each time it moves
 using intids.
 
-For previous version of Silva, look at previous version of
+For previous version of `Silva`_, look at previous version of
 ``silva.app.redirectlink``.
 
 Code repository
 ===============
 
-You can find the code for this extension in Mercurial:
-https://hg.infrae.com/silva.app.redirectlink/.
+You can find the code for this extension in Git:
+https://github.com/silvacms/silva.app.redirectlink
+
+_ ..Silva: http://silvacms.org

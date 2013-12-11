@@ -13,7 +13,7 @@ tests_require = [
 
 setup(name='silva.app.redirectlink',
       version=version,
-      description="A link which does a permanent HTTP redirect to a Silva Object",
+      description="Provides a link which does a permanent HTTP redirect to a moved Silva content",
       long_description=open("README.txt").read() + "\n" +
                        open(os.path.join("docs", "HISTORY.txt")).read(),
       classifiers=[
@@ -25,7 +25,7 @@ setup(name='silva.app.redirectlink',
       keywords='silva app redirect permanent http',
       author='Sylvain Viollon',
       author_email='info@infrae.com',
-      url='http://infrae.com/products/silva',
+      url='https://github.com/silvacms/silva.app.redirectlink',
       license='BSD',
       package_dir={'': 'src'},
       packages=find_packages('src', exclude=['ez_setup']),
