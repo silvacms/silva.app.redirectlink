@@ -35,4 +35,4 @@ Code repository
 You can find the code for this extension in Git:
 https://github.com/silvacms/silva.app.redirectlink
 
-_ ..Silva: http://silvacms.org
+.. _Silva: http://silvacms.org
